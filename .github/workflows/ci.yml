@@ -60,14 +60,18 @@ jobs:
         node-version: 20
         cache: 'npm'
 
-    # 3. Publicar no npm
+    # 3. Autenticação ao NPM
+    - name: Authenticate to npm
+      run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+
+    # 4. Publicar no npm
     - name: Publish to npm
       run: npm publish
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
  
   # Destivado! Não quero enviar mensagens no discord, então não vou montar.
-    # # 4. Notificar no Discord 
+    # # 5. Notificar no Discord 
     # - name: Notify Discord
     #   uses: Ilshidur/action-discord@v2
     #   with:
