@@ -1,5 +1,5 @@
 {
-  "name": "CalculadoraTypeScript",
+  "name": "calculadora-ts-jessicaduque",
   "version": "1.0.0",
   "description": "Uma biblioteca de calculadora em TypeScript para operações matemáticas básicas.",
   "main": "dist/calculadora.js",
