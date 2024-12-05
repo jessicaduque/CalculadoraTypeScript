@@ -39,8 +39,8 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       with:
         args: >
-          -Dsonar.organization=seu-organization
-          -Dsonar.projectKey=seu-project-key
+          -Dsonar.organization=Jessica Nogueira Duque
+          -Dsonar.projectKey=jessicaduque
           -Dsonar.sources=src
 
   publish:
@@ -66,9 +66,9 @@ jobs:
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-    # 4. Notificar no Discord
-    - name: Notify Discord
-      uses: Ilshidur/action-discord@v2
-      with:
-        webhook: ${{ secrets.DISCORD_WEBHOOK }}
-        message: "🚀 Uma nova versão da calculadora foi publicada no npm!"
+    # # 4. Notificar no Discord
+    # - name: Notify Discord
+    #   uses: Ilshidur/action-discord@v2
+    #   with:
+    #     webhook: ${{ secrets.DISCORD_WEBHOOK }}
+    #     message: "🚀 Uma nova versão da calculadora foi publicada no npm!"
