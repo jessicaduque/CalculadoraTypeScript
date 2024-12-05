@@ -39,8 +39,8 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       with:
         args: >
-          -Dsonar.organization=Jessica Nogueira Duque
-          -Dsonar.projectKey=jessicaduque
+          -Dsonar.organization=jessicaduque
+          -Dsonar.projectKey=jessicaduque_CalculadoraTypeScript
           -Dsonar.sources=src
 
   publish:
