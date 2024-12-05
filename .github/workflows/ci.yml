@@ -65,8 +65,9 @@ jobs:
       run: npm publish
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-    # # 4. Notificar no Discord
+ 
+  # Destivado! Não quero enviar mensagens no discord, então não vou montar.
+    # # 4. Notificar no Discord 
     # - name: Notify Discord
     #   uses: Ilshidur/action-discord@v2
     #   with:
