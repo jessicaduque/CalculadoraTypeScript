@@ -1,0 +1,74 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Checkout do código
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # 2. Configurar Node.js
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20
+        cache: 'npm'
+
+    # 3. Instalar dependências
+    - name: Install dependencies
+      run: npm install
+
+    # 4. Rodar os testes unitários
+    - name: Run tests
+      run: npm test
+
+    # 5. Analisar a qualidade do código com Sonar
+    - name: SonarCloud Scan
+      uses: sonarsource/sonarcloud-github-action@v2
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      with:
+        args: >
+          -Dsonar.organization=seu-organization
+          -Dsonar.projectKey=seu-project-key
+          -Dsonar.sources=src
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+
+    steps:
+    # 1. Checkout do código
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # 2. Configurar Node.js
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20
+        cache: 'npm'
+
+    # 3. Publicar no npm
+    - name: Publish to npm
+      run: npm publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+    # 4. Notificar no Discord
+    - name: Notify Discord
+      uses: Ilshidur/action-discord@v2
+      with:
+        webhook: ${{ secrets.DISCORD_WEBHOOK }}
+        message: "🚀 Uma nova versão da calculadora foi publicada no npm!"
