@@ -2,41 +2,78 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
   pull_request:
-    branches: [ "main" ]
-
-permissions:
-  contents: read
+    branches:
+      - main
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     # 1. Checkout do código
     - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      uses: actions/checkout@v3
 
-    # 2. Configurar versão de Python
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
+    # 2. Configurar Node.js
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
       with:
-        python-version: "3.10"
+        node-version: 20
+        cache: 'npm'
 
     # 3. Instalar dependências
     - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install flake8 pytest
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      run: npm install
 
-        
-     # 4. Analisar a qualidade do código com Sonar
+    # 4. Rodar os testes unitários
+    - name: Run tests
+      run: npm test
+
+    # 5. Analisar a qualidade do código com Sonar
     - name: SonarCloud Scan
-      uses: SonarSource/sonarqube-scan-action@v5
+      uses: sonarsource/sonarcloud-github-action@v2
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      with:
+        args: >
+          -Dsonar.organization=jessicaduque
+          -Dsonar.projectKey=jessicaduque_CalculadoraTypeScript
+          -Dsonar.sources=src
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    #if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+
+    steps:
+    # 1. Checkout do código
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # 2. Configurar Node.js
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20
+        cache: 'npm'
+
+    # 3. Autenticação ao NPM
+    - name: Authenticate to npm
+      run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+
+    # 4. Publicar no npm
+    - name: Publish to npm
+      run: npm publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+ 
+  # Destivado! Não quero enviar mensagens no discord, então não vou montar.
+    # # 5. Notificar no Discord 
+    # - name: Notify Discord
+    #   uses: Ilshidur/action-discord@v2
+    #   with:
+    #     webhook: ${{ secrets.DISCORD_WEBHOOK }}
+    #     message: "🚀 Uma nova versão da calculadora foi publicada no npm!"
